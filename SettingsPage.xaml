@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="imsapp_desktop.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Loaded="Page_Loaded">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Padding="32" MaxWidth="700">
+            <TextBlock Text="Settings" Style="{StaticResource PageTitleStyle}" Margin="0,0,0,8" />
+            <TextBlock Text="Branding &amp; System Configuration" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="16" Margin="0,0,0,24" />
+
+            <!-- Business Information -->
+            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="Business Information" Style="{StaticResource SectionHeaderStyle}" />
+                    <TextBox x:Name="BusinessNameBox" Header="Business Name (Full)" PlaceholderText="e.g. Mini Price Hardware" Margin="0,0,0,12" />
+                    <TextBox x:Name="BusinessNameShortBox" Header="Business Name (Short)" PlaceholderText="e.g. Mini Price" Margin="0,0,0,12" />
+                    <TextBox x:Name="TaglineBox" Header="Business Tagline" PlaceholderText="Brief description" Margin="0,0,0,12" />
+                    <TextBox x:Name="AddressBox" Header="Address" PlaceholderText="Business address" Margin="0,0,0,12" />
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="PhoneBox" Grid.Column="0" Header="Phone" PlaceholderText="+256 XXX XXXXXX" Margin="0,0,0,0" />
+                        <TextBox x:Name="EmailBox" Grid.Column="1" Header="Email" PlaceholderText="info@example.com" Margin="0,0,0,0" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- System Settings -->
+            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="System Settings" Style="{StaticResource SectionHeaderStyle}" />
+                    <TextBox x:Name="CurrencySymbolBox" Header="Currency Symbol" PlaceholderText="e.g. ugx, USD, KSH" Margin="0,0,0,12" />
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <NumberBox x:Name="LowStockBox" Grid.Column="0" Header="Low Stock Threshold" Value="30" Minimum="1" SpinButtonPlacementMode="Inline" Margin="0,0,0,12" />
+                        <NumberBox x:Name="CriticalStockBox" Grid.Column="1" Header="Critical Stock Level" Value="10" Minimum="0" SpinButtonPlacementMode="Inline" Margin="0,0,0,12" />
+                    </Grid>
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <NumberBox x:Name="ExpiryWarningBox" Grid.Column="0" Header="Expiry Warning (Days)" Value="90" Minimum="1" SpinButtonPlacementMode="Inline" Margin="0,0,0,0" />
+                        <NumberBox x:Name="ExpiryCriticalBox" Grid.Column="1" Header="Critical Expiry (Days)" Value="30" Minimum="1" SpinButtonPlacementMode="Inline" Margin="0,0,0,0" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <Button Content="Save Settings" Style="{ThemeResource AccentButtonStyle}" Click="Save_Click" />
+                <Button Content="Cancel" Click="Cancel_Click" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

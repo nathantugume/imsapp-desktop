@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="imsapp_desktop.ProfilePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Padding="32" MaxWidth="600">
+            <Grid Margin="0,0,0,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Profile" Style="{StaticResource PageTitleStyle}" Margin="0,0,0,8" />
+                    <TextBlock Text="Personal Details" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="16" />
+                </StackPanel>
+                <Button x:Name="ResetPasswordButton" Grid.Column="1" Content="Reset Password" Click="ResetPasswordButton_Click"
+                        Style="{ThemeResource AccentButtonStyle}" VerticalAlignment="Center" />
+            </Grid>
+
+            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,0,0">
+                <StackPanel Spacing="12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="140" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontWeight="SemiBold" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="NameText" Margin="0,0,0,8" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Email" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontWeight="SemiBold" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="EmailText" Margin="0,0,0,8" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Role" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontWeight="SemiBold" />
+                        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="RoleText" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

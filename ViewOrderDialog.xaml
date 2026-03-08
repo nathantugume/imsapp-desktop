@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentDialog
+    x:Class="imsapp_desktop.ViewOrderDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Order Details"
+    PrimaryButtonText="Close"
+    DefaultButton="Primary">
+
+    <ScrollViewer MaxHeight="400">
+        <StackPanel x:Name="ContentPanel" Padding="8" />
+    </ScrollViewer>
+</ContentDialog>

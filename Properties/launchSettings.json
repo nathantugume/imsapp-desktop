@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "imsapp-desktop (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "imsapp-desktop (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

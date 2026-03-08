@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentDialog
+    x:Class="imsapp_desktop.ViewProductDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Product Details"
+    PrimaryButtonText="Close"
+    DefaultButton="Primary">
+
+    <ScrollViewer MaxHeight="400">
+        <StackPanel x:Name="ContentPanel" Padding="0,8,0,0" />
+    </ScrollViewer>
+</ContentDialog>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentDialog
+    x:Class="imsapp_desktop.CategoryEditDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Add Category"
+    PrimaryButtonText="Save"
+    SecondaryButtonText="Cancel"
+    PrimaryButtonClick="Save_Click"
+    DefaultButton="Primary">
+
+    <StackPanel Padding="0,8,0,0">
+        <TextBox x:Name="CategoryNameBox" Header="Category Name" PlaceholderText="Enter category name" Margin="0,0,0,8" />
+        <ComboBox x:Name="StatusCombo" Header="Status" SelectedIndex="0" Margin="0,0,0,0">
+            <x:String>Active</x:String>
+            <x:String>Inactive</x:String>
+        </ComboBox>
+    </StackPanel>
+</ContentDialog>
