@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentDialog
+    x:Class="imsapp_desktop.InvoiceDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Invoice"
+    PrimaryButtonText="Print"
+    SecondaryButtonText="Close"
+    DefaultButton="Secondary"
+    PrimaryButtonClick="Print_Click">
+
+    <StackPanel>
+        <InfoBar x:Name="PrintMessageBar" IsOpen="False" Severity="Informational" IsClosable="True" Margin="0,0,0,8" />
+        <ScrollViewer MaxHeight="500" VerticalScrollBarVisibility="Auto">
+            <StackPanel x:Name="InvoicePanel" Padding="16" Spacing="8" />
+        </ScrollViewer>
+    </StackPanel>
+</ContentDialog>

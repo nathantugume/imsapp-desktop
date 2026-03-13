@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentDialog
+    x:Class="imsapp_desktop.AddStockDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Add Stock"
+    PrimaryButtonText="Add"
+    SecondaryButtonText="Cancel"
+    PrimaryButtonClick="Add_Click"
+    DefaultButton="Primary">
+
+    <StackPanel Padding="0,8,0,0">
+        <TextBlock x:Name="ProductNameText" FontWeight="SemiBold" Margin="0,0,0,8" />
+        <TextBlock x:Name="CurrentStockText" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,0,0,12" />
+        <NumberBox x:Name="QuantityBox" Header="Quantity to Add" Value="1" Minimum="1" SpinButtonPlacementMode="Inline" />
+    </StackPanel>
+</ContentDialog>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentDialog
+    x:Class="imsapp_desktop.RecordPaymentDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Record Payment"
+    PrimaryButtonText="Record"
+    SecondaryButtonText="Cancel"
+    PrimaryButtonClick="Record_Click"
+    DefaultButton="Primary">
+
+    <StackPanel Padding="0,8,0,0">
+        <TextBlock x:Name="OrderInfoText" Margin="0,0,0,8" TextWrapping="Wrap" />
+        <NumberBox x:Name="AmountBox" Header="Amount" Value="0" Minimum="0" SpinButtonPlacementMode="Inline" Margin="0,0,0,8" />
+        <ComboBox x:Name="MethodCombo" Header="Payment Method" SelectedIndex="0" Margin="0,0,0,8">
+            <x:String>Cash</x:String>
+            <x:String>Mobile Money</x:String>
+            <x:String>Bank Transfer</x:String>
+            <x:String>Other</x:String>
+        </ComboBox>
+        <TextBox x:Name="NotesBox" Header="Notes (optional)" PlaceholderText="Optional notes" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,0" />
+    </StackPanel>
+</ContentDialog>
