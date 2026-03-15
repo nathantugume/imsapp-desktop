@@ -32,5 +32,5 @@ jobs:
         run: |
           dotnet tool install -g vpk
           vpk download github --repoUrl https://github.com/${{ github.repository }} --token ${{ secrets.GITHUB_TOKEN }} || true
-          vpk pack --packId imsapp-desktop --packVersion ${{ steps.get-version.outputs.version }} --packDir publish --mainExe imsapp-desktop.exe
-          vpk upload github --repoUrl https://github.com/${{ github.repository }} --token ${{ secrets.GITHUB_TOKEN }} --publish --releaseName "imsapp-desktop ${{ steps.get-version.outputs.version }}" --tag v${{ steps.get-version.outputs.version }}
+          vpk pack -u imsapp-desktop -v ${{ steps.get-version.outputs.version }} -p publish -e imsapp-desktop.exe --skipVeloAppCheck
+          vpk upload github -o Releases --repoUrl https://github.com/${{ github.repository }} --token ${{ secrets.GITHUB_TOKEN }} --publish --releaseName "imsapp-desktop ${{ steps.get-version.outputs.version }}" --tag v${{ steps.get-version.outputs.version }}
