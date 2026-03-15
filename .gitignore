@@ -357,9 +357,15 @@ healthchecksdb
 Installer/Output/
 Installer/mysql-bundle/
 Installer/mysql-extract/
+Installer/mysql-staging/
+Installer/mysql-*.zip
+Installer/mariadb-*.zip
 
 # Backup folder for Package Reference Convert tool in Visual Studio 2017
 MigrationBackup/
+
+# Temp scripts (e.g. password hash generator)
+temp-hash/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/

@@ -8,6 +8,11 @@ using MySqlConnector;
 namespace imsapp_desktop.Services;
 
 /// <summary>
+/// Progress reported during database bootstrap for UI feedback.
+/// </summary>
+public record DatabaseBootstrapProgress(string Status, int ProgressPercent, bool IsIndeterminate);
+
+/// <summary>
 /// Ensures database connectivity: uses existing MySQL if available, otherwise starts bundled MySQL.
 /// </summary>
 public static class DatabaseBootstrapService
@@ -18,66 +23,100 @@ public static class DatabaseBootstrapService
     /// Ensures we can connect to MySQL. Tries existing first, then starts bundled if configured.
     /// Updates AppSettings.ConnectionString when using bundled.
     /// </summary>
-    public static async Task<(BootstrapResult Result, string Message)> EnsureDatabaseAsync()
+    /// <param name="progress">Optional progress reporter for UI (status text, progress bar).</param>
+    public static async Task<(BootstrapResult Result, string Message)> EnsureDatabaseAsync(
+        IProgress<DatabaseBootstrapProgress>? progress = null)
     {
+        void Report(string status, int percent, bool indeterminate = false) =>
+            progress?.Report(new DatabaseBootstrapProgress(status, percent, indeterminate));
+
         AppConfig.Load();
         AppSettings.ConnectionString = AppConfig.ConnectionString;
 
-        // 1. Try to connect with current config
+        // 1. Check if database is already running (existing MySQL or bundled)
+        Report("Checking database connection...", 10, true);
         if (await TryConnectAsync(AppSettings.ConnectionString))
         {
+            Report("Database ready.", 100);
             await CreateDatabaseIfNeededAsync();
             await RunSchemaIfNeededAsync();
             return (BootstrapResult.UsingExisting, "Connected to existing MySQL.");
         }
 
+        // 1b. Try connecting without database (server may be up but imsapp not created yet)
+        var connNoDb = new MySqlConnectionStringBuilder(AppSettings.ConnectionString) { Database = "" };
+        if (await TryConnectAsync(connNoDb.ConnectionString))
+        {
+            Report("Setting up database...", 80);
+            await CreateDatabaseIfNeededAsync();
+            await RunSchemaIfNeededAsync();
+            if (await TryConnectAsync(AppSettings.ConnectionString))
+            {
+                Report("Database ready.", 100);
+                return (BootstrapResult.UsingExisting, "Connected to existing MySQL.");
+            }
+        }
+
         // 2. Check if bundled MySQL is configured and available
+        Report("Database not found. Checking for bundled database...", 15);
         var bundledPath = ResolveBundledMySQLPath();
         if (string.IsNullOrEmpty(bundledPath))
-            return (BootstrapResult.Failed, "Cannot connect to MySQL. Please configure the connection in Settings or install with bundled database.");
+            return (BootstrapResult.Failed, "Cannot connect to MySQL. If you have MySQL installed, edit %LocalAppData%\\imsapp-desktop\\appsettings.json and set ConnectionString (e.g. Server=localhost;Database=imsapp;User=root;Password=;). Or use the installer that includes the database.");
 
-        var mysqld = Path.Combine(bundledPath, "bin", "mysqld.exe");
-        if (!File.Exists(mysqld))
-            return (BootstrapResult.Failed, $"Bundled MySQL not found at {mysqld}");
+        var serverExe = ResolveServerExe(bundledPath);
+        if (string.IsNullOrEmpty(serverExe))
+            return (BootstrapResult.Failed, "Bundled MySQL/MariaDB not found (need bin\\mysqld.exe or bin\\mariadbd.exe)");
 
         var dataDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "imsapp-desktop", "mysql-data");
 
-        // 3. Initialize data directory if needed
+        // 3. Initialize data directory if needed (first run)
         if (!Directory.Exists(dataDir) || !Directory.EnumerateFileSystemEntries(dataDir).Any())
         {
-            var initResult = InitializeDataDirectory(mysqld, dataDir);
+            Report("Initializing database (first run)...", 25, true);
+            var initResult = InitializeDataDirectory(serverExe, dataDir);
             if (!initResult.Success)
                 return (BootstrapResult.Failed, initResult.Message);
         }
 
-        // 4. Start mysqld if not already running
-        if (!await IsBundledMySQLRunningAsync())
+        // 4. Check if bundled MySQL is already running, or start it
+        if (await IsBundledMySQLRunningAsync())
         {
-            var startResult = StartBundledMySQL(mysqld, dataDir);
+            Report("Database already running. Setting up...", 60);
+        }
+        else
+        {
+            Report("Starting database...", 35, true);
+            var startResult = StartBundledMySQL(serverExe, dataDir);
             if (!startResult.Success)
                 return (BootstrapResult.Failed, startResult.Message);
 
-            // Wait for MySQL to accept connections (connect without database - imsapp may not exist yet)
-            await Task.Delay(3000);
-            for (int i = 0; i < 10; i++)
+            Report("Waiting for database to start...", 50, true);
+            await Task.Delay(2000);
+            for (int i = 0; i < 15; i++)
             {
                 if (await TryConnectAsync(AppConfig.GetBundledConnectionStringNoDb()))
                     break;
+                Report($"Waiting for database to start... (attempt {i + 1}/15)", 50 + (i * 2), true);
                 await Task.Delay(1000);
             }
         }
 
-        // 5. Switch to bundled connection and create database
+        // 5. Switch to bundled connection, create database, then verify
         AppSettings.ConnectionString = AppConfig.GetBundledConnectionString();
-        if (!await TryConnectAsync(AppSettings.ConnectionString))
-            return (BootstrapResult.Failed, "Bundled MySQL started but connection failed. Please check the logs.");
+        if (!await TryConnectAsync(AppConfig.GetBundledConnectionStringNoDb()))
+            return (BootstrapResult.Failed, "Bundled MySQL failed to start. Check the error log in %LocalAppData%\\imsapp-desktop\\mysql-data\\ or configure an external MySQL in appsettings.json.");
 
+        Report("Setting up database...", 85);
         await CreateDatabaseIfNeededAsync();
         await RunSchemaIfNeededAsync();
+        if (!await TryConnectAsync(AppSettings.ConnectionString))
+            return (BootstrapResult.Failed, "Could not connect to imsapp database after creating it.");
+
         AppConfig.ConnectionString = AppSettings.ConnectionString;
         AppConfig.Save();
+        Report("Database ready.", 100);
 
         return (BootstrapResult.StartedBundled, "Bundled MySQL started successfully.");
     }
@@ -104,21 +143,32 @@ public static class DatabaseBootstrapService
         // Check next to executable (installer places mysql folder alongside app)
         var appDir = AppContext.BaseDirectory;
         var pathNextToExe = Path.Combine(appDir, "mysql");
-        if (Directory.Exists(pathNextToExe) && File.Exists(Path.Combine(pathNextToExe, "bin", "mysqld.exe")))
+        if (Directory.Exists(pathNextToExe) && ResolveServerExe(pathNextToExe) != null)
             return pathNextToExe;
 
         return null;
     }
 
-    private static (bool Success, string Message) InitializeDataDirectory(string mysqld, string dataDir)
+    private static string? ResolveServerExe(string bundledPath)
+    {
+        var mysqld = Path.Combine(bundledPath, "bin", "mysqld.exe");
+        if (File.Exists(mysqld)) return mysqld;
+        var mariadbd = Path.Combine(bundledPath, "bin", "mariadbd.exe");
+        if (File.Exists(mariadbd)) return mariadbd;
+        return null;
+    }
+
+    private static (bool Success, string Message) InitializeDataDirectory(string serverExe, string dataDir)
     {
         try
         {
             Directory.CreateDirectory(dataDir);
+            var mysqlBase = Path.GetDirectoryName(Path.GetDirectoryName(serverExe)) ?? ".";
             var psi = new ProcessStartInfo
             {
-                FileName = mysqld,
+                FileName = serverExe,
                 Arguments = $"--initialize-insecure --datadir=\"{dataDir}\"",
+                WorkingDirectory = mysqlBase,
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardError = true
@@ -141,17 +191,18 @@ public static class DatabaseBootstrapService
         return await TryConnectAsync(AppConfig.GetBundledConnectionStringNoDb());
     }
 
-    private static (bool Success, string Message) StartBundledMySQL(string mysqld, string dataDir)
+    private static (bool Success, string Message) StartBundledMySQL(string serverExe, string dataDir)
     {
         try
         {
+            var mysqlBase = Path.GetDirectoryName(Path.GetDirectoryName(serverExe)) ?? ".";
             var psi = new ProcessStartInfo
             {
-                FileName = mysqld,
+                FileName = serverExe,
                 Arguments = $"--datadir=\"{dataDir}\" --port={AppConfig.BundledPort} --standalone",
-                UseShellExecute = true,
-                CreateNoWindow = true,
-                WindowStyle = ProcessWindowStyle.Hidden
+                WorkingDirectory = mysqlBase,
+                UseShellExecute = false,
+                CreateNoWindow = true
             };
             Process.Start(psi);
             return (true, "");

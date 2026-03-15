@@ -1,5 +1,5 @@
-; IMS App Desktop - Inno Setup script
-; Build: Run build-installer.ps1 (publishes app, then builds this)
+; IMS App Desktop - Inno Setup script (with bundled MySQL)
+; Build: .\Installer\build-installer.ps1 -IncludeDatabase
 
 #define AppName "IMS App"
 #define AppExe "imsapp-desktop.exe"
@@ -9,16 +9,15 @@
 
 [Setup]
 AppId={{c8c726b2-270e-4d7d-8be0-9b4d7c206e93}
-AppName={#AppName}
+AppName={#AppName} (with Database)
 AppVersion={#AppVersion}
 AppPublisher=Nathan
 AppPublisherURL=https://github.com/nathantugume/imsapp-desktop
-; Install to LocalAppData to avoid WinUI 3 issues when running from Program Files
 DefaultDirName={localappdata}\IMS App
 DefaultGroupName=IMS App
 AllowNoIcons=yes
 OutputDir=Output
-OutputBaseFilename=IMSApp-Setup-{#AppVersion}
+OutputBaseFilename=IMSApp-Setup-WithDB-{#AppVersion}
 UninstallDisplayIcon={app}\{#AppExe}
 Compression=lzma2
 SolidCompression=yes
@@ -34,8 +33,10 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-; Published app files (from ..\publish)
+; Published app files
 Source: "..\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Bundled MySQL (must exist in mysql-staging before build)
+Source: "mysql-staging\*"; DestDir: "{app}\mysql"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExe}"

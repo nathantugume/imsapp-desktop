@@ -22,6 +22,10 @@
                 <TextBlock x:Name="ErrorText" Foreground="Red" TextWrapping="Wrap" Visibility="Collapsed" />
                 <Button x:Name="LoginButton" Content="Sign In" HorizontalAlignment="Stretch"
                         Style="{ThemeResource AccentButtonStyle}" Click="LoginButton_Click" />
+                <HyperlinkButton x:Name="SetupDbLink" Content="Set up database manually"
+                                 HorizontalAlignment="Center" FontSize="12"
+                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                 Click="SetupDbLink_Click" />
             </StackPanel>
         </Border>
     </Grid>

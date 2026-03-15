@@ -35,13 +35,60 @@ namespace imsapp_desktop
 
         public App()
         {
+            Services.CrashLog.Write("App constructor: before InitializeComponent");
             InitializeComponent();
+            Services.CrashLog.Write("App constructor: after InitializeComponent");
             GlobalFontSettings.UseWindowsFontsUnderWindows = true;
+            Services.CrashLog.Write("App constructor: done");
         }
 
         protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            var (result, message) = await DatabaseBootstrapService.EnsureDatabaseAsync();
+            Services.CrashLog.Write("OnLaunched: start");
+
+            var statusText = new TextBlock
+            {
+                Text = "Checking database connection...",
+                FontSize = 16,
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, 0, 0, 16)
+            };
+            var progressBar = new ProgressBar
+            {
+                Height = 8,
+                IsIndeterminate = true,
+                HorizontalAlignment = HorizontalAlignment.Stretch
+            };
+            var loadingPanel = new StackPanel
+            {
+                VerticalAlignment = VerticalAlignment.Center,
+                Padding = new Thickness(32, 24, 32, 24),
+                Children = { statusText, progressBar }
+            };
+            var loadingWindow = new Window
+            {
+                Title = "IMS App",
+                Content = loadingPanel,
+                ExtendsContentIntoTitleBar = true
+            };
+            loadingWindow.AppWindow.Resize(new Windows.Graphics.SizeInt32(420, 160));
+            loadingWindow.Activate();
+
+            var progress = new Progress<Services.DatabaseBootstrapProgress>(p =>
+            {
+                var queue = DispatcherQueue.GetForCurrentThread();
+                queue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                {
+                    statusText.Text = p.Status;
+                    progressBar.IsIndeterminate = p.IsIndeterminate;
+                    progressBar.Value = p.ProgressPercent;
+                });
+            });
+
+            var (result, message) = await DatabaseBootstrapService.EnsureDatabaseAsync(progress);
+            Services.CrashLog.Write($"OnLaunched: database result={result}");
+
+            loadingWindow.Close();
 
             if (result == DatabaseBootstrapService.BootstrapResult.Failed)
             {

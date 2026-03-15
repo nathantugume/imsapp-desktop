@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentDialog
+    x:Class="imsapp_desktop.DatabaseSetupDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Set up database manually"
+    PrimaryButtonText="Save and restart"
+    SecondaryButtonText="Cancel"
+    PrimaryButtonClick="Save_Click"
+    DefaultButton="Primary">
+
+    <ScrollViewer MaxHeight="450">
+        <StackPanel Padding="0,8,0,0">
+            <TextBlock Text="Enter your MySQL connection details. The app will restart after saving."
+                       TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,0,0,12" />
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <Button x:Name="DetectButton" Content="Detect databases" Click="Detect_Click" Margin="0,0,8,0" />
+                <TextBlock x:Name="DetectStatus" VerticalAlignment="Center" FontSize="12"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+            <TextBlock Text="Detected instances (click to use):" FontWeight="SemiBold" Margin="0,0,0,4" />
+            <ListView x:Name="DetectedList" MaxHeight="120" SelectionMode="Single" IsItemClickEnabled="True"
+                      ItemClick="DetectedList_ItemClick" Margin="0,0,0,12">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Display}" TextWrapping="Wrap" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <TextBox x:Name="ServerBox" Header="Server" PlaceholderText="localhost" Margin="0,0,0,8" />
+            <NumberBox x:Name="PortBox" Header="Port" Value="3306" Minimum="1" Maximum="65535"
+                       SpinButtonPlacementMode="Inline" Margin="0,0,0,8" />
+            <TextBox x:Name="DatabaseBox" Header="Database" PlaceholderText="imsapp" Margin="0,0,0,8" />
+            <TextBox x:Name="UserBox" Header="User" PlaceholderText="root" Margin="0,0,0,8" />
+            <PasswordBox x:Name="PasswordBox" Header="Password" PlaceholderText="Leave empty if no password" Margin="0,0,0,0" />
+        </StackPanel>
+    </ScrollViewer>
+</ContentDialog>

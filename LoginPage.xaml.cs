@@ -42,4 +42,10 @@ public sealed partial class LoginPage : Page
             LoginButton.IsEnabled = true;
         }
     }
+
+    private async void SetupDbLink_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new DatabaseSetupDialog { XamlRoot = XamlRoot };
+        await dialog.ShowAsync();
+    }
 }
