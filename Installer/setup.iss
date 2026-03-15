@@ -1,25 +1,29 @@
-; IMS App Desktop - Inno Setup Script
-; Build: iscc setup.iss (requires Inno Setup 6)
+; IMS App Desktop - Inno Setup script
+; Build: Run build-installer.ps1 (publishes app, then builds this)
 
-#define MyAppName "IMS App"
-#define MyAppVersion "1.0"
-#define MyAppPublisher "Your Company"
-#define MyAppExeName "imsapp-desktop.exe"
+#define AppName "IMS App"
+#define AppExe "imsapp-desktop.exe"
+#ifndef AppVersion
+#define AppVersion "1.0.0"
+#endif
 
 [Setup]
-AppId={{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}
-AppName={#MyAppName}
-AppVersion={#MyAppVersion}
-AppPublisher={#MyAppPublisher}
+AppId={{c8c726b2-270e-4d7d-8be0-9b4d7c206e93}
+AppName={#AppName}
+AppVersion={#AppVersion}
+AppPublisher=Nathan
+AppPublisherURL=https://github.com/nathantugume/imsapp-desktop
 DefaultDirName={autopf}\IMS App
-DefaultGroupName={#MyAppName}
+DefaultGroupName=IMS App
+AllowNoIcons=yes
 OutputDir=Output
-OutputBaseFilename=IMSApp-Setup-{#MyAppVersion}
+OutputBaseFilename=IMSApp-Setup-{#AppVersion}
+UninstallDisplayIcon={app}\{#AppExe}
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
-ArchitecturesAllowed=x64
-ArchitecturesInstallIn64BitMode=x64
+ArchitecturesAllowed=x64compatible
+ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired=admin
 
 [Languages]
@@ -29,14 +33,13 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-; App files from publish output
-Source: "..\bin\Release\net8.0-windows10.0.19041.0\win-x64\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-; Bundled MySQL (place mysql folder in Installer\mysql-bundle before building)
-Source: "mysql-bundle\*"; DestDir: "{app}\mysql"; Flags: ignoreversion recursesubdirs createallsubdirs skipifsourcedoesntexist
+; Published app files (from ..\publish)
+Source: "..\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExe}"
+Name: "{group}\{cm:UninstallProgram,{#AppName}}"; Filename: "{uninstallexe}"
+Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExe}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchProgram,{#StringChange(AppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent

@@ -42,47 +42,29 @@ The app can start a bundled MySQL instance so users don’t need to install MySQ
 
 ### Prerequisites
 
-- [Inno Setup 6](https://jrsoftware.org/isinfo.php)
+- [Inno Setup 6](https://jrsoftware.org/isinfo.php) (`winget install JRSoftware.InnoSetup`)
 - .NET 8 SDK
-- MySQL 8.0 Windows ZIP (for bundling)
 
-### Step 1: Publish the app
+### Build the installer
+
+Run the build script (it publishes the app and builds the installer in one step):
 
 ```powershell
 cd c:\Users\Nathan\source\repos\imsapp-desktop
-dotnet publish -c Release -r win-x64 --self-contained true
+.\Installer\build-installer.ps1
 ```
 
-Output: `bin\Release\net8.0-windows10.0.19041.0\win-x64\publish\`
+Or manually:
+1. Publish: `dotnet publish -c Release -r win-x64 --self-contained true -o publish`
+2. Build: Open `Installer\setup.iss` in Inno Setup, or run `ISCC.exe setup.iss` from the Installer folder.
 
-### Step 2: Add bundled MySQL
+The installer is created in `Installer\Output\IMSApp-Setup-{version}.exe`.
 
-1. Download MySQL 8.0 for Windows (ZIP):
-   - https://dev.mysql.com/downloads/mysql/
-   - Choose "Windows (x86, 64-bit), ZIP Archive"
-
-2. Extract the ZIP and copy the contents into:
-   ```
-   imsapp-desktop\Installer\mysql-bundle\
-   ```
-   The folder should contain `bin\mysqld.exe`, `bin\mysql.exe`, etc.
-
-3. Optional: Remove unneeded files (docs, test, etc.) to reduce size.
-
-### Step 3: Build the installer
-
-1. Open `Installer\setup.iss` in Inno Setup Compiler.
-2. Or run from command line:
-   ```powershell
-   & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
-   ```
-3. The installer will be created in `Installer\Output\IMSApp-Setup-1.0.exe`.
-
-### Step 4: Install and test
+### Install and test
 
 - Run the installer.
 - Launch IMS App from the Start menu.
-- On first run, the app will initialize and start bundled MySQL (may take a few seconds).
+- On first run, ensure MySQL is running (or configure connection in Settings).
 - Default login: `admin@gmail.com` / `password` (change after first login).
 
 ---
@@ -92,24 +74,21 @@ Output: `bin\Release\net8.0-windows10.0.19041.0\win-x64\publish\`
 ```
 Installer/
 ├── setup.iss          # Inno Setup script
-├── mysql-bundle/      # Add MySQL contents here before building
-│   ├── bin/
-│   │   ├── mysqld.exe
-│   │   └── ...
-│   └── ...
-├── Output/            # Generated installer
-│   └── IMSApp-Setup-1.0.exe
+├── build-installer.ps1 # Publish + build script
+├── Output/            # Generated installer (IMSApp-Setup-{version}.exe)
 └── SETUP_GUIDE.md
 ```
 
+The script uses `..\publish\` (created by dotnet publish) as the app source.
+
 ---
 
-## Build without bundled MySQL
+## MySQL requirement
 
-If you omit the `mysql-bundle` folder, the installer will still work. Users must either:
+The installer does not bundle MySQL. Users must either:
 
-- Have MySQL installed and running, and configure the connection in Settings, or
-- Manually place a MySQL folder next to the installer/app.
+- Have MySQL installed and running (default: localhost:3306, user root, no password), or
+- Configure the connection in Settings after first launch.
 
 ---
 
