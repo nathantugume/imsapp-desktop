@@ -12,4 +12,9 @@ public static class AppSettings
     /// Connection string for MySQL. Override via user config file if needed.
     /// </summary>
     public static string ConnectionString { get; set; } = DefaultConnectionString;
+
+    /// <summary>
+    /// URL for updates. Use GitHub repo URL for GitHub Releases, or a custom feed URL for Velopack packages.
+    /// </summary>
+    public static string UpdateUrl { get; set; } = "https://github.com/nathantugume/imsapp-desktop";
 }

@@ -1,3 +1,4 @@
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using PdfSharp.Fonts;
@@ -44,17 +45,25 @@ namespace imsapp_desktop
 
             if (result == DatabaseBootstrapService.BootstrapResult.Failed)
             {
-                var dialog = new ContentDialog
-                {
-                    Title = "Database Error",
-                    Content = message,
-                    PrimaryButtonText = "OK",
-                    XamlRoot = null
-                };
                 s_window = new MainWindow();
                 s_window.Activate();
-                dialog.XamlRoot = s_window.Content.XamlRoot;
-                await dialog.ShowAsync();
+
+                var queue = DispatcherQueue.GetForCurrentThread();
+                queue.TryEnqueue(DispatcherQueuePriority.Low, async () =>
+                {
+                    var xamlRoot = s_window?.Content?.XamlRoot;
+                    if (xamlRoot != null)
+                    {
+                        var dialog = new ContentDialog
+                        {
+                            Title = "Database Error",
+                            Content = message,
+                            PrimaryButtonText = "OK",
+                            XamlRoot = xamlRoot
+                        };
+                        await dialog.ShowAsync();
+                    }
+                });
                 return;
             }
 

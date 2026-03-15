@@ -17,8 +17,10 @@ public static class ServiceLocator
     private static IReportService? _reports;
     private static IBrandingService? _branding;
     private static IUserService? _users;
+    private static IUpdateService? _updates;
 
     public static IAuthService Auth => _auth ??= new AuthService();
+    public static IUpdateService Updates => _updates ??= new UpdateService();
     public static IUserService Users => _users ??= new UserService();
     public static IProductService Products => _products ??= new ProductService();
     public static ICategoryService Categories => _categories ??= new CategoryService();

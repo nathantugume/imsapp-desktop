@@ -63,6 +63,7 @@ namespace imsapp_desktop
                     "Reports" => typeof(ReportsPage),
                     "Users" => typeof(UserListPage),
                     "Settings" => typeof(SettingsPage),
+                    "Updates" => typeof(UpdatesPage),
                     "Profile" => typeof(ProfilePage),
                     _ => typeof(PlaceholderPage)
                 };
