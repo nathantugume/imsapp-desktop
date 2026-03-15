@@ -46,76 +46,16 @@ namespace imsapp_desktop
         {
             Services.CrashLog.Write("OnLaunched: start");
 
-            var statusText = new TextBlock
-            {
-                Text = "Checking database connection...",
-                FontSize = 16,
-                TextWrapping = TextWrapping.Wrap,
-                Margin = new Thickness(0, 0, 0, 16)
-            };
-            var progressBar = new ProgressBar
-            {
-                Height = 8,
-                IsIndeterminate = true,
-                HorizontalAlignment = HorizontalAlignment.Stretch
-            };
-            var loadingPanel = new StackPanel
-            {
-                VerticalAlignment = VerticalAlignment.Center,
-                Padding = new Thickness(32, 24, 32, 24),
-                Children = { statusText, progressBar }
-            };
-            var loadingWindow = new Window
-            {
-                Title = "IMS App",
-                Content = loadingPanel,
-                ExtendsContentIntoTitleBar = true
-            };
-            loadingWindow.AppWindow.Resize(new Windows.Graphics.SizeInt32(420, 160));
-            loadingWindow.Activate();
+            // Single window from start - no separate loading window to avoid WinUI exiting when last window closes
+            s_window = new MainWindow();
+            s_window.Activate();
 
-            var progress = new Progress<Services.DatabaseBootstrapProgress>(p =>
-            {
-                var queue = DispatcherQueue.GetForCurrentThread();
-                queue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
-                {
-                    statusText.Text = p.Status;
-                    progressBar.IsIndeterminate = p.IsIndeterminate;
-                    progressBar.Value = p.ProgressPercent;
-                });
-            });
-
+            var progress = (s_window as MainWindow)!.GetBootstrapProgress();
             var (result, message) = await DatabaseBootstrapService.EnsureDatabaseAsync(progress);
             Services.CrashLog.Write($"OnLaunched: database result={result}");
 
-            loadingWindow.Close();
-
-            if (result == DatabaseBootstrapService.BootstrapResult.Failed)
-            {
-                s_window = new MainWindow();
-                s_window.Activate();
-
-                var queue = DispatcherQueue.GetForCurrentThread();
-                queue.TryEnqueue(DispatcherQueuePriority.Low, async () =>
-                {
-                    var xamlRoot = s_window?.Content?.XamlRoot;
-                    if (xamlRoot != null)
-                    {
-                        var dialog = new ContentDialog
-                        {
-                            Title = "Database Error",
-                            Content = message,
-                            PrimaryButtonText = "OK",
-                            XamlRoot = xamlRoot
-                        };
-                        await dialog.ShowAsync();
-                    }
-                });
-                return;
-            }
-
-            s_window = new MainWindow();
-            s_window.Activate();
+            if (s_window is MainWindow mainWin)
+                mainWin.OnBootstrapComplete(result, message);
         }
     }
 }

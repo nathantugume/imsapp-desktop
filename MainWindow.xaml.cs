@@ -12,10 +12,51 @@ namespace imsapp_desktop
         public MainWindow()
         {
             InitializeComponent();
+            // Loading overlay is visible; MainContent hidden until OnBootstrapComplete
+        }
+
+        public IProgress<DatabaseBootstrapProgress> GetBootstrapProgress()
+        {
+            return new Progress<DatabaseBootstrapProgress>(p =>
+            {
+                LoadingStatus.Text = p.Status;
+                LoadingProgress.IsIndeterminate = p.IsIndeterminate;
+                LoadingProgress.Value = p.ProgressPercent;
+            });
+        }
+
+        public void OnBootstrapComplete(DatabaseBootstrapService.BootstrapResult result, string message)
+        {
+            LoadingOverlay.Visibility = Visibility.Collapsed;
+            MainContent.Visibility = Visibility.Visible;
+
+            if (result == DatabaseBootstrapService.BootstrapResult.Failed)
+            {
+                ShowLogin(); // Show login so user can use "Set up database manually"
+                _ = ShowDatabaseErrorAsync(message);
+                return;
+            }
+
             if (ServiceLocator.Auth.IsLoggedIn)
                 ShowMainApp();
             else
                 ShowLogin();
+        }
+
+        private async System.Threading.Tasks.Task ShowDatabaseErrorAsync(string message)
+        {
+            var xamlRoot = Content?.XamlRoot;
+            if (xamlRoot != null)
+            {
+                var dialog = new ContentDialog
+                {
+                    Title = "Database Error",
+                    Content = message,
+                    PrimaryButtonText = "OK",
+                    XamlRoot = xamlRoot
+                };
+                await dialog.ShowAsync();
+            }
         }
 
         public void OnLoginSuccess()

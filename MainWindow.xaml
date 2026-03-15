@@ -14,8 +14,15 @@
     </Window.SystemBackdrop>
 
     <Grid>
-        <Frame x:Name="LoginFrame" Visibility="Collapsed" />
-        <NavigationView x:Name="NavView" IsBackButtonVisible="Collapsed" PaneDisplayMode="Left"
+        <Grid x:Name="LoadingOverlay" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="32,24">
+            <StackPanel Spacing="16">
+                <TextBlock x:Name="LoadingStatus" Text="Checking database connection..." FontSize="16" TextWrapping="Wrap" />
+                <ProgressBar x:Name="LoadingProgress" Height="8" IsIndeterminate="True" HorizontalAlignment="Stretch" />
+            </StackPanel>
+        </Grid>
+        <Grid x:Name="MainContent" Visibility="Collapsed">
+            <Frame x:Name="LoginFrame" Visibility="Collapsed" />
+            <NavigationView x:Name="NavView" IsBackButtonVisible="Collapsed" PaneDisplayMode="Left"
                         IsPaneToggleButtonVisible="True" OpenPaneLength="280" CompactModeThresholdWidth="640"
                         IsSettingsVisible="False" ItemInvoked="NavView_ItemInvoked">
             <NavigationView.MenuItems>
@@ -71,5 +78,6 @@
             </NavigationView.FooterMenuItems>
             <Frame x:Name="ContentFrame" />
         </NavigationView>
+        </Grid>
     </Grid>
 </Window>

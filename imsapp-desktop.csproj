@@ -14,7 +14,7 @@
     <ApplicationTitle>imsapp-desktop</ApplicationTitle>
     <AssemblyName>imsapp-desktop</AssemblyName>
     <ProjectGuid>c8c726b2-270e-4d7d-8be0-9b4d7c206e93</ProjectGuid>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
   </PropertyGroup>
 
   <Target Name="UpdateManifestVersion" BeforeTargets="BeforeBuild">
