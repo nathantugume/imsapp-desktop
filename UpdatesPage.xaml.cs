@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Velopack;
@@ -14,8 +15,19 @@ public sealed partial class UpdatesPage : Page
         InitializeComponent();
     }
 
+    private static string GetCurrentVersion()
+    {
+        var asm = Assembly.GetExecutingAssembly();
+        var info = asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+        if (!string.IsNullOrEmpty(info?.InformationalVersion))
+            return info.InformationalVersion;
+        var ver = asm.GetName().Version;
+        return ver != null ? ver.ToString() : "—";
+    }
+
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
+        CurrentVersionText.Text = $"Current version: {GetCurrentVersion()}";
         if (!ServiceLocator.Updates.IsUpdateSupported)
         {
             StatusText.Text = "Automatic updates are not configured. Set Config.AppSettings.UpdateUrl when deploying with Velopack.";
